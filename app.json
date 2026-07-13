@@ -1,0 +1,405 @@
+{
+  "id": "nutrition-agent-flow-aman-raj",
+  "name": "AI Nutrition Agent",
+  "description": "An AI-powered Nutrition Agent built using IBM Granite models via IBM watsonx.ai and LangFlow. Provides personalized diet plans, calorie analysis, BMI calculations, and family nutrition recommendations with Indian food preferences.",
+  "is_component": false,
+  "last_tested_version": "1.3.4",
+  "endpoint_name": "nutrition-agent",
+  "tags": ["nutrition", "ibm-watsonx", "granite", "health", "agentic-ai"],
+  "data": {
+    "nodes": [
+      {
+        "id": "ChatInput-001",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 350 },
+        "data": {
+          "type": "ChatInput",
+          "node": {
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": false,
+                "placeholder": "Ask about nutrition, diet plans, BMI, or meal suggestions...",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "",
+                "name": "input_value",
+                "display_name": "User Message"
+              },
+              "sender": {
+                "type": "str",
+                "required": false,
+                "value": "User",
+                "name": "sender",
+                "display_name": "Sender"
+              },
+              "sender_name": {
+                "type": "str",
+                "required": false,
+                "value": "User",
+                "name": "sender_name",
+                "display_name": "Sender Name"
+              },
+              "session_id": {
+                "type": "str",
+                "required": false,
+                "value": "",
+                "name": "session_id",
+                "display_name": "Session ID"
+              },
+              "should_store_message": {
+                "type": "bool",
+                "required": false,
+                "value": true,
+                "name": "should_store_message",
+                "display_name": "Store Messages"
+              }
+            },
+            "description": "Accepts user queries about nutrition, diet, and health.",
+            "display_name": "Chat Input",
+            "documentation": ""
+          },
+          "id": "ChatInput-001"
+        }
+      },
+      {
+        "id": "SystemPrompt-002",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "type": "Prompt",
+          "node": {
+            "template": {
+              "template": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are NutriBot, an expert AI Nutrition Agent powered by IBM Granite. Your role is to help users with personalized dietary guidance.\n\n## AGENT_INSTRUCTIONS\n\n### TONE & STYLE\n- Friendly, supportive, and encouraging\n- Use simple language; avoid complex medical jargon\n- Always end responses with a motivational note\n\n### DIET SPECIALIZATION\n- Expert in Indian cuisine and traditional food culture\n- Familiar with regional Indian diets: North Indian (roti, sabzi), South Indian (rice, sambar), Bengali, Gujarati, etc.\n- Understand vegetarian and vegan Indian dietary patterns\n- Include spices (turmeric, cumin, coriander) and their health benefits\n\n### CORE CAPABILITIES\n1. Personalized Nutrition Plans: Ask for age, weight, height, health conditions, allergies, fitness goals\n2. BMI Calculator: Calculate BMI and interpret results (Underweight < 18.5, Normal 18.5-24.9, Overweight 25-29.9, Obese >= 30)\n3. Calorie Analysis: Provide detailed calorie counts for Indian and international foods\n4. Family Diet Profiles: Manage nutrition for multiple family members with different needs\n5. Meal Planning: Create weekly meal plans with Indian recipes\n6. Disease-Specific Diets: Diabetes-friendly, heart-healthy, PCOS, thyroid, kidney diet plans\n\n### SAFETY RULES\n- Always recommend consulting a doctor or registered dietitian for medical conditions\n- Never diagnose medical conditions\n- Flag if a requested diet is dangerously low in calories (< 1200 kcal for women, < 1500 kcal for men)\n- Remind users that weight loss should be gradual (0.5-1 kg per week)\n\n### INDIAN FOOD PREFERENCES\n- Prioritize locally available Indian ingredients\n- Suggest alternatives: quinoa = daliya (broken wheat), Greek yogurt = thick hung curd\n- Include popular Indian superfoods: methi, amla, moringa, tulsi, ashwagandha\n- Respect religious dietary restrictions (Jain, Hindu fasting, Halal)\n\n### RESPONSE FORMAT\n- Use bullet points and emojis for readability\n- Include meal timing suggestions\n- Provide portion sizes in cups/bowls (not just grams)\n- Add a 'Quick Tip' at the end of each response\n\nCurrent user profile (update as user shares info):\n- Name: {user_name}\n- Age: {user_age}\n- Health Goal: {health_goal}",
+                "name": "template",
+                "display_name": "System Prompt"
+              },
+              "user_name": {
+                "type": "str",
+                "required": false,
+                "value": "Friend",
+                "name": "user_name",
+                "display_name": "User Name"
+              },
+              "user_age": {
+                "type": "str",
+                "required": false,
+                "value": "Not specified",
+                "name": "user_age",
+                "display_name": "User Age"
+              },
+              "health_goal": {
+                "type": "str",
+                "required": false,
+                "value": "General wellness",
+                "name": "health_goal",
+                "display_name": "Health Goal"
+              }
+            },
+            "description": "Customizable system prompt with AGENT_INSTRUCTIONS for diet specialization, Indian food preferences, and safety rules.",
+            "display_name": "System Prompt",
+            "documentation": ""
+          },
+          "id": "SystemPrompt-002"
+        }
+      },
+      {
+        "id": "WatsonxModel-003",
+        "type": "genericNode",
+        "position": { "x": 500, "y": 220 },
+        "data": {
+          "type": "WatsonxAIModel",
+          "node": {
+            "template": {
+              "model_id": {
+                "type": "str",
+                "required": true,
+                "value": "ibm/granite-3-2-8b-instruct",
+                "options": [
+                  "ibm/granite-3-2-8b-instruct",
+                  "ibm/granite-3-0-8b-instruct",
+                  "ibm/granite-13b-instruct-v2",
+                  "ibm/granite-20b-multilingual"
+                ],
+                "name": "model_id",
+                "display_name": "Granite Model"
+              },
+              "url": {
+                "type": "str",
+                "required": true,
+                "value": "https://us-south.ml.cloud.ibm.com",
+                "name": "url",
+                "display_name": "Watson X URL"
+              },
+              "project_id": {
+                "type": "str",
+                "required": true,
+                "value": "",
+                "password": false,
+                "name": "project_id",
+                "display_name": "IBM Cloud Project ID"
+              },
+              "api_key": {
+                "type": "str",
+                "required": true,
+                "value": "",
+                "password": true,
+                "name": "api_key",
+                "display_name": "IBM Cloud API Key"
+              },
+              "max_new_tokens": {
+                "type": "int",
+                "required": false,
+                "value": 1024,
+                "name": "max_new_tokens",
+                "display_name": "Max New Tokens"
+              },
+              "temperature": {
+                "type": "float",
+                "required": false,
+                "value": 0.7,
+                "name": "temperature",
+                "display_name": "Temperature"
+              },
+              "top_p": {
+                "type": "float",
+                "required": false,
+                "value": 0.9,
+                "name": "top_p",
+                "display_name": "Top P"
+              },
+              "repetition_penalty": {
+                "type": "float",
+                "required": false,
+                "value": 1.1,
+                "name": "repetition_penalty",
+                "display_name": "Repetition Penalty"
+              }
+            },
+            "description": "IBM watsonx.ai model using Granite 3.2 8B Instruct for nutrition reasoning and personalized recommendations.",
+            "display_name": "IBM Watsonx AI (Granite)",
+            "documentation": "https://www.ibm.com/products/watsonx-ai"
+          },
+          "id": "WatsonxModel-003"
+        }
+      },
+      {
+        "id": "NutritionKnowledge-004",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 600 },
+        "data": {
+          "type": "File",
+          "node": {
+            "template": {
+              "path": {
+                "type": "file",
+                "required": false,
+                "value": "",
+                "name": "path",
+                "display_name": "Nutrition Dataset",
+                "file_types": [".pdf", ".txt", ".csv", ".json"],
+                "info": "Upload USDA food composition data, WHO dietary guidelines, or custom Indian food nutrition CSV"
+              },
+              "silent_errors": {
+                "type": "bool",
+                "required": false,
+                "value": false,
+                "name": "silent_errors",
+                "display_name": "Silent Errors"
+              }
+            },
+            "description": "Upload nutrition datasets (USDA, WHO guidelines, Indian food composition tables) for RAG-based retrieval.",
+            "display_name": "Nutrition Knowledge Base (RAG)",
+            "documentation": ""
+          },
+          "id": "NutritionKnowledge-004"
+        }
+      },
+      {
+        "id": "Agent-005",
+        "type": "genericNode",
+        "position": { "x": 850, "y": 350 },
+        "data": {
+          "type": "Agent",
+          "node": {
+            "template": {
+              "agent_description": {
+                "type": "str",
+                "required": false,
+                "value": "AI Nutrition Agent powered by IBM Granite. Specializes in personalized Indian diet planning, calorie analysis, BMI calculation, and family nutrition management.",
+                "name": "agent_description",
+                "display_name": "Agent Description"
+              },
+              "system_prompt": {
+                "type": "str",
+                "required": false,
+                "value": "",
+                "name": "system_prompt",
+                "display_name": "System Prompt (from node)"
+              },
+              "max_iterations": {
+                "type": "int",
+                "required": false,
+                "value": 10,
+                "name": "max_iterations",
+                "display_name": "Max Iterations"
+              },
+              "handle_parsing_errors": {
+                "type": "bool",
+                "required": false,
+                "value": true,
+                "name": "handle_parsing_errors",
+                "display_name": "Handle Parsing Errors"
+              },
+              "verbose": {
+                "type": "bool",
+                "required": false,
+                "value": true,
+                "name": "verbose",
+                "display_name": "Verbose"
+              }
+            },
+            "description": "Orchestrates multi-agent nutrition tasks: diet planning, calorie analysis, BMI calculation, and family profile management.",
+            "display_name": "Nutrition Agent Orchestrator",
+            "documentation": ""
+          },
+          "id": "Agent-005"
+        }
+      },
+      {
+        "id": "TextInput-006",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 820 },
+        "data": {
+          "type": "TextInput",
+          "node": {
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": false,
+                "value": "Family members:\n1. Father (45 yrs, diabetic, 80kg, 175cm)\n2. Mother (42 yrs, thyroid, 65kg, 162cm)\n3. Child (16 yrs, active, 55kg, 165cm)",
+                "multiline": true,
+                "name": "input_value",
+                "display_name": "Family Profile Data"
+              }
+            },
+            "description": "Input family member profiles for personalized multi-member diet recommendations.",
+            "display_name": "Family Profile Input",
+            "documentation": ""
+          },
+          "id": "TextInput-006"
+        }
+      },
+      {
+        "id": "ChatOutput-007",
+        "type": "genericNode",
+        "position": { "x": 1200, "y": 350 },
+        "data": {
+          "type": "ChatOutput",
+          "node": {
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "value": "",
+                "name": "input_value",
+                "display_name": "AI Response"
+              },
+              "sender": {
+                "type": "str",
+                "required": false,
+                "value": "NutriBot",
+                "name": "sender",
+                "display_name": "Sender"
+              },
+              "sender_name": {
+                "type": "str",
+                "required": false,
+                "value": "NutriBot 🥗",
+                "name": "sender_name",
+                "display_name": "Sender Name"
+              },
+              "session_id": {
+                "type": "str",
+                "required": false,
+                "value": "",
+                "name": "session_id",
+                "display_name": "Session ID"
+              },
+              "should_store_message": {
+                "type": "bool",
+                "required": false,
+                "value": true,
+                "name": "should_store_message",
+                "display_name": "Store Messages"
+              }
+            },
+            "description": "Displays personalized nutrition advice, meal plans, calorie analysis, and health recommendations from the AI agent.",
+            "display_name": "Chat Output",
+            "documentation": ""
+          },
+          "id": "ChatOutput-007"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-chatinput-agent",
+        "source": "ChatInput-001",
+        "target": "Agent-005",
+        "sourceHandle": "ChatInput-001-output-message-ChatInput|Message",
+        "targetHandle": "Agent-005-input-input-Agent|Message",
+        "data": { "targetHandle": { "fieldName": "input_value" } }
+      },
+      {
+        "id": "edge-systemprompt-agent",
+        "source": "SystemPrompt-002",
+        "target": "Agent-005",
+        "sourceHandle": "SystemPrompt-002-output-prompt-Prompt|Message",
+        "targetHandle": "Agent-005-input-system_prompt-Agent|str",
+        "data": { "targetHandle": { "fieldName": "system_prompt" } }
+      },
+      {
+        "id": "edge-watsonx-agent",
+        "source": "WatsonxModel-003",
+        "target": "Agent-005",
+        "sourceHandle": "WatsonxModel-003-output-model-WatsonxAIModel|LanguageModel",
+        "targetHandle": "Agent-005-input-llm-Agent|LanguageModel",
+        "data": { "targetHandle": { "fieldName": "llm" } }
+      },
+      {
+        "id": "edge-knowledgebase-agent",
+        "source": "NutritionKnowledge-004",
+        "target": "Agent-005",
+        "sourceHandle": "NutritionKnowledge-004-output-data-File|Data",
+        "targetHandle": "Agent-005-input-tools-Agent|Data",
+        "data": { "targetHandle": { "fieldName": "tools" } }
+      },
+      {
+        "id": "edge-familyprofile-agent",
+        "source": "TextInput-006",
+        "target": "Agent-005",
+        "sourceHandle": "TextInput-006-output-text-TextInput|Message",
+        "targetHandle": "Agent-005-input-context-Agent|Message",
+        "data": { "targetHandle": { "fieldName": "context" } }
+      },
+      {
+        "id": "edge-agent-output",
+        "source": "Agent-005",
+        "target": "ChatOutput-007",
+        "sourceHandle": "Agent-005-output-response-Agent|Message",
+        "targetHandle": "ChatOutput-007-input-input_value-ChatOutput|Message",
+        "data": { "targetHandle": { "fieldName": "input_value" } }
+      }
+    ],
+    "viewport": {
+      "x": -50,
+      "y": 0,
+      "zoom": 0.85
+    }
+  }
+}
